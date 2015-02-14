@@ -13,3 +13,10 @@ Array.prototype.forEach.call(
 		embed.parentNode.removeChild(embed);
 	}
 );
+Array.prototype.forEach.call(
+	document.getElementsByTagName("iframe"),
+	function(iframe){
+		if (!iframe.src.match(/youtube\.(googleapis\.)?com/) || iframe.src.match(/html5=1/) ) { return; }
+		iframe.src += (-1 === iframe.src.indexOf("?")) ? "?html5=1" : "&html5=1";
+	}
+);
