@@ -13,6 +13,11 @@ play with newer versions of Firefox.
 Under windows set `media.windows-media-foundation.enabled` to true and under 
 linux set `gstreamer.enabled` to true to enable H264 support.
 
+## Building ##
+
+This addon was built with Mozillas JetPack SDK, so building it is as simple
+as running `cfx xpi`. To build it with support for Android, use `cfx xpi --force-mobile`.
+
 ## Attribution ##
 
 Thanks to [Paul Battley] [threedaymonk] for the userscript and to [Klemens 
