@@ -1,6 +1,6 @@
 # HTML5 YouTube Everywhere #
 
-This addon replaces the old Flash based &lt;embed tags with HTML5 iframes,
+This addon replaces the old Flash based &lt;embed> tags with HTML5 iframes,
 including videos with monetarisation enabled.
 
 ## Usage ##
