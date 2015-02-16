@@ -16,23 +16,47 @@ function insertVideoIframe(video, insertInto) {
 	return true;
 }
  
- // http://web.archive.org/web/20130807080443/http://www.techtricky.com/how-to-get-url-parameters-using-javascript/
- function getUrlParams() {
+// http://web.archive.org/web/20130807080443/http://www.techtricky.com/how-to-get-url-parameters-using-javascript/
+function getUrlParams() {
 	var params = {};
 	window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) {
 		params[key] = value;
 	});
 	return params;
 }
-
-var url = getUrlParams();
-if(url && url.v) {
-	var insertInto = document.getElementById("player-api-legacy") || document.getElementById("player-api");
-	if (insertInto) console.log("has insertInto");
-	else console.log("no insertInto found");
-	if (insertVideoIframe(url.v, insertInto)) console.log("inserted into");
-	else console.log("failed insert");
-	// get rid of the overlay blocking access to player
-	var tb = document.getElementById("theater-background");
-	if (tb) tb.remove();
+function doYoutube() {
+	if (lock) { return false; }
+	else lock = 1;
+	if (tries > 3) {
+		var removeFrom = document.getElementById("player-api") || document.getElementById("player-api-legacy");
+		if (removeFrom) removeFrom.removeEventListener("DOMSubtreeModified", doYoutube, false);
+		lock = 0;
+		return false;
+	}
+	var url = getUrlParams();
+	tries++;
+	if(url && url.v) {
+		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
+		if (!insertInto) { 
+			lock = 0; 
+			return false; 
+		}
+		if (!insertVideoIframe(url.v, insertInto)) { 
+			lock = 0; 
+			return false; 
+		}	
+		// get rid of the overlay blocking access to player
+		var tb = document.getElementById("theater-background");
+		if (tb) tb.remove();
+	}
+	else {
+		lock = 0;
+		return false;
+	}
+	lock = 0;
+	return true;
 }
+tries = 0;
+lock = 0;
+var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
+if (addTo) addTo.addEventListener("DOMSubtreeModified", doYoutube, false);
