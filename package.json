@@ -2,7 +2,7 @@
   "name": "html5-youtube-everywhere",
   "title": "HTML5 YouTube Everywhere",
   "id": "jid1-b2ybw6mPlFZm6Q",
-  "description": "Replace the old Flash based embedded YouTube videos with HTML5 iframes",
+  "description": "Replace the old Flash based embedded YouTube videos with HTML5 iframes and force existing iframes to use HTML5.",
   "author": "Riku-Pekka Silvola",
   "permissions": { "private-browsing" : true,
 		   "unsafe-content-script": true },
