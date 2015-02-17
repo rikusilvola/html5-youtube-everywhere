@@ -24,18 +24,22 @@ function getUrlParams() {
 	});
 	return params;
 }
+mtx = 0;
+function trylock() { return mtx; }
+function lock() { while (trylock()) {} mtx = 1; }
+function unlock() { mtx = 0; }
 function doYoutube() {
-	if (lock) { return false; }
-	else lock = 1;
+	if (trylock()) return false;
+	else lock();
 	var url = getUrlParams();
 	if(url && url.v) {
 		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 		if (!insertInto) { 
-			lock = 0; 
+			unlock(); 
 			return false; 
 		}
 		if (!insertVideoIframe(url.v, insertInto)) { 
-			lock = 0; 
+			unlock();
 			return false; 
 		}	
 		// get rid of the overlay blocking access to player
@@ -43,14 +47,20 @@ function doYoutube() {
 		if (tb) tb.remove();
 	}
 	else {
-		lock = 0;
+		unlock();
 		return false;
 	}
-	lock = 0;
+	unlock();
 	return true;
 }
+var observer = new MutationObserver(function(mutations) {
+	doYoutube();
+});
+
+var mutationConfig = { childList: true, subtree: true };
+	
 if (self.options.settings.prefs["yt-force-iframe"]) {
-	lock = 0;
 	var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 	if (addTo) addTo.addEventListener("DOMSubtreeModified", doYoutube, false);
+	//if (addTo) observer.observe(addTo, mutationConfig);
 }
