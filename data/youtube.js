@@ -56,7 +56,12 @@ function doYoutube() {
 	lock = 0;
 	return true;
 }
-tries = 0;
-lock = 0;
-var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
-if (addTo) addTo.addEventListener("DOMSubtreeModified", doYoutube, false);
+if (self.options.settings["yt-force-iframe"]) {
+	tries = 0;
+	lock = 0;
+	var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
+	if (addTo) addTo.addEventListener("DOMSubtreeModified", doYoutube, false);
+}
+else {
+	console.log("no settings['yt-force-iframe']");
+}
