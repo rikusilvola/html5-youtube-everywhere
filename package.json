@@ -15,6 +15,6 @@
       "title": "Use iframe player in YouTube",
       "description": "Tries to replace the video player in YouTube with an HTML5 iframe.",
       "type": "bool",
-      "value": false
+      "value": true 
   }] 
 }
