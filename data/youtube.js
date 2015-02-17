@@ -54,13 +54,26 @@ function doYoutube() {
 	return true;
 }
 var observer = new MutationObserver(function(mutations) {
-	doYoutube();
+	var doTube = false;
+	mutations.forEach(function(mutation) { 
+		if (mutation.addedNodes.length > 0) // only replace when something was added
+			doTube = true;
+	});
+	if (doTube && !trylock()) { // don't even try if already replacing
+		this.disconnect(); // prevent triggering self
+		console.log("doYoutube"); 
+		doYoutube();
+		bindObserver(); // rebind to catch further mutations
+	}
 });
 
-var mutationConfig = { childList: true, subtree: true };
+var mutationConfig = { childList: true };
 	
-if (self.options.settings.prefs["yt-force-iframe"]) {
-	var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
-	if (addTo) addTo.addEventListener("DOMSubtreeModified", doYoutube, false);
-	//if (addTo) observer.observe(addTo, mutationConfig);
+function bindObserver() {		
+	if (self.options.settings.prefs["yt-force-iframe"]) {
+		var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
+		if (addTo) observer.observe(addTo, mutationConfig);
+	}
 }
+
+bindObserver();

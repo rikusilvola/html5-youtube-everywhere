@@ -2,7 +2,7 @@
   "name": "html5-youtube-everywhere",
   "title": "HTML5 YouTube Everywhere",
   "id": "jid1-b2ybw6mPlFZm6Q",
-  "description": "Replace the old Flash based embedded YouTube videos with HTML5 iframes and force existing iframes to use the HTML5 player.",
+  "description": "Replace the old Flash based embedded YouTube videos with HTML5 iframes and force existing iframes to use the HTML5 player.\nOption for also replacing the flash based player in YouTube with an HTML5 iframe.",
   "author": "Riku-Pekka Silvola",
   "permissions": { "private-browsing" : true,
 		   "unsafe-content-script": true },
@@ -15,6 +15,6 @@
       "title": "Use iframe player in YouTube",
       "description": "Tries to replace the video player in YouTube with an HTML5 iframe.",
       "type": "bool",
-      "value": true 
+      "value": false 
   }] 
 }
