@@ -27,14 +27,7 @@ function getUrlParams() {
 function doYoutube() {
 	if (lock) { return false; }
 	else lock = 1;
-	if (tries > 3) {
-		var removeFrom = document.getElementById("player-api") || document.getElementById("player-api-legacy");
-		if (removeFrom) removeFrom.removeEventListener("DOMSubtreeModified", doYoutube, false);
-		lock = 0;
-		return false;
-	}
 	var url = getUrlParams();
-	tries++;
 	if(url && url.v) {
 		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 		if (!insertInto) { 
@@ -56,12 +49,8 @@ function doYoutube() {
 	lock = 0;
 	return true;
 }
-if (self.options.settings["yt-force-iframe"]) {
-	tries = 0;
+if (self.options.settings.prefs["yt-force-iframe"]) {
 	lock = 0;
 	var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 	if (addTo) addTo.addEventListener("DOMSubtreeModified", doYoutube, false);
-}
-else {
-	console.log("no settings['yt-force-iframe']");
 }
