@@ -4,6 +4,9 @@ function insertVideoIframe(video, insertInto) {
 	}
 	var player = document.createElement("iframe");
 	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?rel=0&autoplay=1&html5=1";
+	if (isPlaylistSite()) {
+		player.src += "&list=" + getUrlParams().list;
+	}
 	player.id = "fallbackIframe";
 	player.width = "100%";
 	player.height = "100%";
@@ -13,7 +16,7 @@ function insertVideoIframe(video, insertInto) {
 		insertInto.removeChild(insertInto.firstChild);
 	}
 	insertInto.appendChild(player);
-	return true;
+	return player;
 }
  
 // http://web.archive.org/web/20130807080443/http://www.techtricky.com/how-to-get-url-parameters-using-javascript/
@@ -38,10 +41,12 @@ function doYoutube() {
 			unlock(); 
 			return false; 
 		}
-		if (!insertVideoIframe(url.v, insertInto)) { 
+		var iframe = insertVideoIframe(url.v, insertInto); 
+		if (!iframe) { 
+			console.log("insertion failed");
 			unlock();
 			return false; 
-		}	
+		}
 		// get rid of the overlay blocking access to player
 		var tb = document.getElementById("theater-background");
 		if (tb) tb.remove();
@@ -53,6 +58,7 @@ function doYoutube() {
 	unlock();
 	return true;
 }
+
 var observer = new MutationObserver(function(mutations) {
 	var doTube = false;
 	mutations.forEach(function(mutation) { 
@@ -66,6 +72,10 @@ var observer = new MutationObserver(function(mutations) {
 		bindObserver(); // rebind to catch further mutations
 	}
 });
+
+function isPlaylistSite() {
+	return !! (getUrlParams().list);
+}
 
 var mutationConfig = { childList: true };
 	
