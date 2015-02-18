@@ -6,12 +6,18 @@ function insertVideoIframe(video, insertInto) {
 	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?rel=0&autoplay=1&html5=1";
 	if (isPlaylistSite()) {
 		player.src += "&list=" + getUrlParams().list;
+		// remove irrelevant sidebar as it refers to the old embed frame
+		var sb = document.getElementById("watch7-sidebar-playlist");
+		if (sb) {
+			sb.remove();
+		}
 	}
 	player.id = "fallbackIframe";
 	player.width = "100%";
 	player.height = "100%";
 	player.setAttribute('allowfullscreen', '');
 	// Remove all childern before inserting iframe
+
 	while (insertInto.hasChildNodes()) {
 		insertInto.removeChild(insertInto.firstChild);
 	}
