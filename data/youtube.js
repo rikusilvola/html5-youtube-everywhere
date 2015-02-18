@@ -5,7 +5,7 @@ function insertVideoIframe(video, insertInto) {
 	var player = document.createElement("iframe");
 	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?rel=0&autoplay=1&html5=1";
 	if (isPlaylistSite()) {
-		player.src += "&list=" + getUrlParams().list;
+		player.src += "&list=" + getUrlParams(window.location).list;
 	}
 	player.id = "fallbackIframe";
 	player.width = "100%";
@@ -20,9 +20,9 @@ function insertVideoIframe(video, insertInto) {
 }
  
 // http://web.archive.org/web/20130807080443/http://www.techtricky.com/how-to-get-url-parameters-using-javascript/
-function getUrlParams() {
+function getUrlParams(url) {
 	var params = {};
-	window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) {
+	url.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) {
 		params[key] = value;
 	});
 	return params;
@@ -34,7 +34,7 @@ function unlock() { mtx = 0; }
 function doYoutube() {
 	if (trylock()) return false;
 	else lock();
-	var url = getUrlParams();
+	var url = getUrlParams(window.location);
 	if(url && url.v) {
 		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 		if (!insertInto) { 
@@ -74,7 +74,7 @@ var observer = new MutationObserver(function(mutations) {
 });
 
 function isPlaylistSite() {
-	return !! (getUrlParams().list);
+	return !! (getUrlParams(window.location).list);
 }
 
 var mutationConfig = { childList: true };
