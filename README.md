@@ -1,7 +1,7 @@
 # HTML5 YouTube Everywhere #
 
 This addon replaces the old Flash based &lt;embed> tags with HTML5 iframes,
-including videos with monetarisation enabled.
+including playlists and videos with monetarisation enabled.
 
 ## Usage ##
 
@@ -12,6 +12,10 @@ Note that many videos on YouTube are only available as H264 and thus will only
 play with newer versions of Firefox.
 Under windows set `media.windows-media-foundation.enabled` to true and under 
 linux set `gstreamer.enabled` to true to enable H264 support.
+
+## To install
+
+Visit https://addons.mozilla.org/en-US/firefox/addon/html5-youtube-everywhere/
 
 ## Building ##
 
