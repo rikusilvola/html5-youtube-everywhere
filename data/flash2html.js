@@ -20,6 +20,12 @@
 		if (iframe.src.match(/youtube\.(googleapis\.)?com/) && !iframe.src.match(/html5=1/)) {
 			iframe.src += (-1 === iframe.src.indexOf("?")) ? "?html5=1" : "&html5=1";
 		}
+		if (!self.options.settings.prefs["yt-clicktoplay-ext"]) {
+			iframe.src += "&autoplay=1"
+		}
+		else {		
+			iframe.src += "&autoplay=0"
+		}
 	}
 	var embeds = []; // create a static copy of selected DOM elements
 	for (var embed of document.getElementsByTagName("embed")) {
@@ -48,6 +54,12 @@
 				else { 
 					console.log("No matching video / playlist params");
 					continue;
+				}				
+				if (!self.options.settings.prefs["yt-clicktoplay-ext"]) {
+					iframe.src += "&autoplay=1"
+				}
+				else {		
+					iframe.src += "&autoplay=0"
 				}
 				iframe.width = embed.width;
 				iframe.height = embed.height;

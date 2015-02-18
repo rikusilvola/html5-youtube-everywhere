@@ -9,12 +9,28 @@
   "icon": "logo/logo32.png",
   "icon64": "logo/logo64.png",
   "license": "GPLv3",
-  "version": "0.5",
-  "preferences": [{
+  "version": "0.5b3",
+  "preferences": [
+	{
+	  "name": "yt-clicktoplay-ext",
+	  "title": "Enable click to play outside YouTube",
+	  "description": "Do not automatically start playing outside of YouTube",
+	  "type": "bool",
+	  "value": true
+	},
+	{
       "name": "yt-force-iframe",
       "title": "Use iframe player in YouTube",
       "description": "Tries to replace the video player in YouTube with an HTML5 iframe.",
       "type": "bool",
       "value": true 
-  }] 
+	},
+	{
+	  "name": "yt-clicktoplay",
+	  "title": "Enable click to play on YouTube",
+	  "description": "Do not automatically start playing on YouTube",
+	  "type": "bool",
+	  "value": false
+	}  
+  ]	 
 }

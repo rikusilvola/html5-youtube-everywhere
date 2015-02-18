@@ -3,7 +3,13 @@ function insertVideoIframe(video, insertInto) {
 		return false;
 	}
 	var player = document.createElement("iframe");
-	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?rel=0&autoplay=1&html5=1";
+	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?html5=1&rel=0";
+	if (!self.options.settings.prefs["yt-clicktoplay"]) {
+		player.src += "&autoplay=1"
+	}
+	else {		
+		player.src += "&autoplay=0"
+	}
 	if (isPlaylistSite()) {
 		player.src += "&list=" + getUrlParams().list;
 	}
