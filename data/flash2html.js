@@ -14,12 +14,11 @@ Array.prototype.forEach.call(
 		}
 		var videoID = embed.src.match(/\/v\/([^&]+)/)[1];
 		var iframe = document.createElement("iframe");
-		var http = (-1 === embed.src.indexOf("https")) ? "http://" : "https://";
 		iframe.width = embed.width;
 		iframe.height = embed.height;
 		iframe.type = "text/html";
 		iframe.frameBorder = "0";
-		iframe.src = http + "www.youtube.com/embed/" + videoID + "?html5=1";
+		iframe.src = "//www.youtube.com/embed/" + videoID + "?html5=1";
 		embed.parentNode.insertBefore(iframe, embed);
 		embed.parentNode.removeChild(embed);
 });
