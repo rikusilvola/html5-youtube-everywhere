@@ -54,6 +54,15 @@ function addSrcOptions (src) {
     }
     return src // did we ad any?
 };
+function replaceNode (newNode, oldNode) {
+    "use strict";
+    if (oldNode.parentNode) {
+        oldNode.parentNode.insertBefore(newNode, oldNode);
+        oldNode.parentNode.removeChild(oldNode);
+    } else {
+        oldNode.nodeValue = newNode.nodeValue;
+    }
+}
 
 // init iframe observer
 iframeObserver = new MutationObserver(function (mutations) {
@@ -62,10 +71,11 @@ iframeObserver = new MutationObserver(function (mutations) {
         for (i = 0; i < mutation.addedNodes.length; i++) {
             name = mutation.addedNodes.item(i).nodeName;
             if (name == "iframe" || name == "IFRAME") {
-                clone = mutation.addedNodes.item(i).cloneNode();
-                clone.src = addSrcOptions(clone.src);
-                mutation.addedNodes.item(i).insertAdjacentHTML("beforebegin", clone.innerHTML);
-                nodesToRemove.push(mutation.addedNodes.item(i));
+//                clone = mutation.addedNodes.item(i).cloneNode();
+//                clone.src = addSrcOptions(clone.src);
+                mutation.addedNodes.item(i).addEventListener("DOMNodeInsertedIntoDocument", function (event) { mutation.addedNodes.item(i).src = addSrcOptions(mutation.addedNodes.item(i).src); });
+//                clone;
+//                nodesToRemove.push(mutation.addedNodes.item(i));
             }
         }
         nodesToRemove.forEach(function (node) { node.remove(); });
@@ -73,6 +83,7 @@ iframeObserver = new MutationObserver(function (mutations) {
     
 });
 iframeObserver.observe(document.body, { childList: true });
+
 
 (function () {
     var iframes = document.getElementsByTagName("iframe"),
