@@ -3,13 +3,10 @@ function insertVideoIframe(video, insertInto) {
 		return false;
 	}
 	var player = document.createElement("iframe");
-	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?html5=1&rel=0";
-	if (!self.options.settings.prefs["yt-clicktoplay"]) {
-		player.src += "&autoplay=1"
-	}
-	else {		
-		player.src += "&autoplay=0"
-	}
+	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?rel=0";
+    if (!player.src.match(/html5=1/)) {
+        player.src += (-1 === player.src.indexOf("?")) ? "?html5=1" : "&html5=1";
+    }
 	if (isPlaylistSite()) {
 		player.src += "&list=" + getUrlParams().list;
 		// remove irrelevant sidebar as it refers to the old embed frame
@@ -22,8 +19,8 @@ function insertVideoIframe(video, insertInto) {
 	player.width = "100%";
 	player.height = "100%";
 	player.setAttribute('allowfullscreen', '');
-	// Remove all childern before inserting iframe
 
+	// Remove all childern before inserting iframe
 	while (insertInto.hasChildNodes()) {
 		insertInto.removeChild(insertInto.firstChild);
 	}

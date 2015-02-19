@@ -1,76 +1,125 @@
+function srcHasOptions (src) {
+    "use strict";
+    return (-1 === src.indexOf("?"));
+};
+function getSrcParams (src) {
+    "use strict";
+    var query = src.replace(/^[^\?]+\??/, ''),
+        Params = {},
+        Pairs,
+        i,
+        KeyVal,
+        key,
+        val;
+    if (!query) {
+        return Params; // return empty object
+    }
+    Pairs = query.split(/[;&]/);
+    for (i = 0; i < Pairs.length; i++) {
+        KeyVal = Pairs[i].split('=');
+        if (KeyVal && KeyVal.length == 2) {
+            key = decodeURIComponent(KeyVal[0]);
+            val = decodeURIComponent(KeyVal[1]);
+            val = val.replace(/\+/g, ' ');
+            Params[key] = val;
+        }
+    }
+    return Params;
+};
+function clickToPlayEnabled () {
+    "use strict";
+    var clicktoplay = false;
+    if (document.URL.match(/youtube\.?com/)) {
+        clicktoplay = self.options.settings.prefs["yt-clicktoplay"];
+    } else {
+        clicktoplay = self.options.settings.prefs["yt-clicktoplay-ext"];
+    }
+    return clicktoplay;
+};
+function addSrcOptions (src) {
+    "use strict";
+    if (src.match(/youtube\.(googleapis\.)?com/)) {
+        var firstOption = srcHasOptions(src);
+        if (!src.match(/html5=1/)) {
+            src += firstOption ? "?html5=1" : "&html5=1";
+            firstOption = false;
+        }
+        if (clickToPlayEnabled() && !src.match(/autoplay=0/)) {
+            src += firstOption ? "?autoplay=0" : "&autoplay=0";
+            firstOption = false;
+        } else if (!clickToPlayEnabled() && !src.match(/autoplay=1/)) {
+            src += firstOption ? "?autoplay=1" : "&autoplay=1";
+            firstOption = false;
+        }
+    }
+    return src // did we ad any?
+};
+
+// init iframe observer
+iframeObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        var i = 0, name = "", clone, nodesToRemove = [];
+        for (i = 0; i < mutation.addedNodes.length; i++) {
+            name = mutation.addedNodes.item(i).nodeName;
+            if (name == "iframe" || name == "IFRAME") {
+                clone = mutation.addedNodes.item(i).cloneNode();
+                clone.src = addSrcOptions(clone.src);
+                mutation.addedNodes.item(i).insertAdjacentHTML("beforebegin", clone.innerHTML);
+                nodesToRemove.push(mutation.addedNodes.item(i));
+            }
+        }
+        nodesToRemove.forEach(function (node) { node.remove(); });
+    });
+    
+});
+iframeObserver.observe(document.body, { childList: true });
+
 (function () {
-	this.getSrcParams = function( src ) {	
-		var query = src.replace(/^[^\?]+\??/,'');
-		var Params = new Object ();
-		if ( ! query ) return Params; // return empty object
-		var Pairs = query.split(/[;&]/);
-		for ( var i = 0; i < Pairs.length; i++ ) {
-			var KeyVal = Pairs[i].split('=');
-			if ( ! KeyVal || KeyVal.length != 2 ) continue;
-			var key = unescape( KeyVal[0] );
-			var val = unescape( KeyVal[1] );
-			val = val.replace(/\+/g, ' ');
-			Params[key] = val;
-			console.log(key + " = " + val);
-		}
-		return Params;
-	}
-	var iframes = document.getElementsByTagName("iframe");
-	for (var iframe of iframes) {
-		if (iframe.src.match(/youtube\.(googleapis\.)?com/) && !iframe.src.match(/html5=1/)) {
-			iframe.src += (-1 === iframe.src.indexOf("?")) ? "?html5=1" : "&html5=1";
-		}
-		if (!self.options.settings.prefs["yt-clicktoplay-ext"]) {
-			iframe.src += "&autoplay=1"
-		}
-		else {		
-			iframe.src += "&autoplay=0"
-		}
-	}
-	var embeds = []; // create a static copy of selected DOM elements
-	for (var embed of document.getElementsByTagName("embed")) {
-		embeds.push(embed);
-	}
-	for (var embed of embeds) {
-		if (embed.src.match(/youtube\.(googleapis\.)?com/)) {
-			var video = embed.src.match(/\/v\/([^&]+)/);
-			var playlist = embed.src.match(/\/p\/([^&]+)/);
-			if (video || playlist) {
-				var iframe = document.createElement("iframe");
-				if (video && video[1]) {	// video ID is the first match within match
-					iframe.src = "//www.youtube.com/embed/" + video[1] + "?html5=1";
-					var params = this.getSrcParams(embed.src);
-					if (params.list) {
-						iframe.src += "&list=" + params.list;
-					}
-				}
-				else if (playlist && playlist[1]) { // playlist ID is the first match within match
-					iframe.src = "//www.youtube.com/embed/videoseries?list=" + playlist[1] + "&html5=1";
-					var params = this.getSrcParams(embed.src);
-					if (params.v) {
-						iframe.src += "&v=" + params.v;
-					}
-				}
-				else { 
-					console.log("No matching video / playlist params");
-					continue;
-				}				
-				if (!self.options.settings.prefs["yt-clicktoplay-ext"]) {
-					iframe.src += "&autoplay=1"
-				}
-				else {		
-					iframe.src += "&autoplay=0"
-				}
-				iframe.width = embed.width;
-				iframe.height = embed.height;
-				iframe.type = "text/html";
-				iframe.frameBorder = "0";
-				embed.parentNode.insertBefore(iframe, embed);
-				embed.parentNode.removeChild(embed);
-			}
-			else {
-				console.log("No video or playlist in embed src");
-			}
-		}
-	}
-})();
+    var iframes = document.getElementsByTagName("iframe"),
+    iframe,
+    embeds = [],
+    embed,
+    video,
+    playlist,
+    params;
+    for (iframe of iframes) {
+        iframe.src = addSrcOptions(iframe.src);
+    }
+    embeds = []; // create a static copy of selected DOM elements
+    for (embed of document.getElementsByTagName("embed")) {
+        embeds.push(embed);
+    }
+    for (embed of embeds) {
+        if (embed.src.match(/youtube\.(googleapis\.)?com/)) {
+            video = embed.src.match(/\/v\/([^&]+)/);
+            playlist = embed.src.match(/\/p\/([^&]+)/);
+            if (video || playlist) {
+                iframe = document.createElement("iframe");
+                if (video && video[1]) {    // video ID is the first match within match
+                    iframe.src = "//www.youtube.com/embed/" + video[1];
+                    params = getSrcParams(embed.src);
+                    if (params.list) {
+                        iframe.src += "?list=" + params.list;
+                    }
+                } else if (playlist && playlist[1]) { // playlist ID is the first match within match
+                    iframe.src = "//www.youtube.com/embed/videoseries?list=" + playlist[1];
+                    params = getSrcParams(embed.src);
+                    if (params.v) {
+                        iframe.src += "&v=" + params.v;
+                    }
+                }
+                if (iframe.src) {
+                    if (!iframe.src.match(/html5=1/)) {
+                        iframe.src += srcHasOptions(iframe.src) ? "?html5=1" : "&html5=1";
+                    }
+                    iframe.width = embed.width;
+                    iframe.height = embed.height;
+                    iframe.type = "text/html";
+                    iframe.frameBorder = "0";
+                    embed.parentNode.insertBefore(iframe, embed);
+                    embed.parentNode.removeChild(embed);
+                }
+            }
+        }
+    }
+}());
