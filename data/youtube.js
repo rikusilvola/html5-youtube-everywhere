@@ -1,12 +1,38 @@
+function addSrcOptions (src) {
+    "use strict";
+    var srcToConcat = "";
+        var firstOption = (-1 === src.indexOf("?"));
+        if (!src.match(/html5=1/)) {
+            srcToConcat += firstOption ? "?html5=1" : "&html5=1";
+            firstOption = false;
+        }
+        if (clickToPlayEnabled() && !src.match(/autoplay=0/)) {
+            srcToConcat += firstOption ? "?autoplay=0" : "&autoplay=0";
+            firstOption = false;
+        } else if (!clickToPlayEnabled() && !src.match(/autoplay=1/)) {
+            srcToConcat += firstOption ? "?autoplay=1" : "&autoplay=1";
+            firstOption = false;
+        }
+    return srcToConcat // did we ad any?
+};
+
+function clickToPlayEnabled () {
+    "use strict";
+    var clicktoplay = false;
+    if (document.URL.match(/youtube\.?com/)) {
+        clicktoplay = self.options.settings.prefs["yt-clicktoplay"];
+    } else {
+        clicktoplay = self.options.settings.prefs["yt-clicktoplay-ext"];
+    }
+    return clicktoplay;
+};
+
 function insertVideoIframe(video, insertInto) {
 	if (!insertInto) {
 		return false;
 	}
 	var player = document.createElement("iframe");
 	player.src = location.protocol + "//www.youtube.com/embed/" + video + "?rel=0";
-    if (!player.src.match(/html5=1/)) {
-        player.src += (-1 === player.src.indexOf("?")) ? "?html5=1" : "&html5=1";
-    }
 	if (isPlaylistSite()) {
 		player.src += "&list=" + getUrlParams().list;
 		// remove irrelevant sidebar as it refers to the old embed frame
@@ -15,6 +41,7 @@ function insertVideoIframe(video, insertInto) {
 			sb.remove();
 		}
 	}
+	player.src += addSrcOptions(player.src);
 	player.id = "fallbackIframe";
 	player.width = "100%";
 	player.height = "100%";

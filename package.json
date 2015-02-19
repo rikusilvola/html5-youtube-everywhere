@@ -31,6 +31,13 @@
 	  "description": "Do not automatically start playing on YouTube",
 	  "type": "bool",
 	  "value": false
-	}  
+	},  
+	{
+      "name": "yt-dynamic-player-replace",
+      "title": "Replace dynamically inserted players",
+      "description": "Monitors for new players and replaces them accordingly.\nNote that this can dramatically slow down your browser on pages that heavily utilize dynamic loading.",
+      "type": "bool",
+      "value": false 
+	}
   ]	 
 }

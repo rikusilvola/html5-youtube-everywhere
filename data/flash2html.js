@@ -1,3 +1,4 @@
+var iframeObserver, embedObserver;
 function srcHasOptions (src) {
     "use strict";
     return (-1 === src.indexOf("?"));
@@ -38,22 +39,24 @@ function clickToPlayEnabled () {
 };
 function addSrcOptions (src) {
     "use strict";
+    var srcToConcat = "";
     if (src.match(/youtube\.(googleapis\.)?com/)) {
         var firstOption = srcHasOptions(src);
         if (!src.match(/html5=1/)) {
-            src += firstOption ? "?html5=1" : "&html5=1";
+            srcToConcat += firstOption ? "?html5=1" : "&html5=1";
             firstOption = false;
         }
         if (clickToPlayEnabled() && !src.match(/autoplay=0/)) {
-            src += firstOption ? "?autoplay=0" : "&autoplay=0";
+            srcToConcat += firstOption ? "?autoplay=0" : "&autoplay=0";
             firstOption = false;
         } else if (!clickToPlayEnabled() && !src.match(/autoplay=1/)) {
-            src += firstOption ? "?autoplay=1" : "&autoplay=1";
+            srcToConcat += firstOption ? "?autoplay=1" : "&autoplay=1";
             firstOption = false;
         }
     }
-    return src // did we ad any?
+    return srcToConcat // did we ad any?
 };
+/* not used */
 function replaceNode (newNode, oldNode) {
     "use strict";
     if (oldNode.parentNode) {
@@ -63,49 +66,16 @@ function replaceNode (newNode, oldNode) {
         oldNode.nodeValue = newNode.nodeValue;
     }
 }
-
-// init iframe observer
-iframeObserver = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-        var i = 0, name = "", clone, nodesToRemove = [];
-        for (i = 0; i < mutation.addedNodes.length; i++) {
-            name = mutation.addedNodes.item(i).nodeName;
-            if (name == "iframe" || name == "IFRAME") {
-//                clone = mutation.addedNodes.item(i).cloneNode();
-//                clone.src = addSrcOptions(clone.src);
-                mutation.addedNodes.item(i).addEventListener("DOMNodeInsertedIntoDocument", function (event) { mutation.addedNodes.item(i).src = addSrcOptions(mutation.addedNodes.item(i).src); });
-//                clone;
-//                nodesToRemove.push(mutation.addedNodes.item(i));
-            }
-        }
-        nodesToRemove.forEach(function (node) { node.remove(); });
-    });
-    
-});
-iframeObserver.observe(document.body, { childList: true });
-
-
-(function () {
-    var iframes = document.getElementsByTagName("iframe"),
-    iframe,
-    embeds = [],
-    embed,
-    video,
-    playlist,
-    params;
-    for (iframe of iframes) {
-        iframe.src = addSrcOptions(iframe.src);
-    }
-    embeds = []; // create a static copy of selected DOM elements
-    for (embed of document.getElementsByTagName("embed")) {
-        embeds.push(embed);
-    }
-    for (embed of embeds) {
-        if (embed.src.match(/youtube\.(googleapis\.)?com/)) {
-            video = embed.src.match(/\/v\/([^&]+)/);
-            playlist = embed.src.match(/\/p\/([^&]+)/);
-            if (video || playlist) {
-                iframe = document.createElement("iframe");
+function replaceEmbedYouTubeFlashPlayer (embed) {
+    var video,
+    	playlist,
+    	params,
+	iframe;
+    if (embed.src.match(/youtube\.(googleapis\.)?com/)) {
+	video = embed.src.match(/\/v\/([^&]+)/);
+	playlist = embed.src.match(/\/p\/([^&]+)/);
+	if (video || playlist) {
+		iframe = document.createElement("iframe");
                 if (video && video[1]) {    // video ID is the first match within match
                     iframe.src = "//www.youtube.com/embed/" + video[1];
                     params = getSrcParams(embed.src);
@@ -120,17 +90,82 @@ iframeObserver.observe(document.body, { childList: true });
                     }
                 }
                 if (iframe.src) {
-                    if (!iframe.src.match(/html5=1/)) {
-                        iframe.src += srcHasOptions(iframe.src) ? "?html5=1" : "&html5=1";
-                    }
+		    if (!self.options.settings.prefs["yt-dynamic-player-replace"]) {
+		    	iframe.src += addSrcOptions(iframe.src); // add options here if dynamic replace disabled
+		    }
+		    console.log(iframe.src);
                     iframe.width = embed.width;
                     iframe.height = embed.height;
                     iframe.type = "text/html";
                     iframe.frameBorder = "0";
                     embed.parentNode.insertBefore(iframe, embed);
                     embed.parentNode.removeChild(embed);
-                }
-            }
+		}
         }
     }
+}
+if (self.options.settings.prefs["yt-dynamic-player-replace"]) {
+	// init iframe mutation summary
+	iframeObserver = new MutationSummary({
+		callback: function (summaries) {
+				summaries.forEach(function (summary) {
+					var srcToConcat = "";
+					summary["added"].forEach(function (node) {
+						srcToConcat = addSrcOptions(node.src);
+						if (srcToConcat) { // don't cause a reflow for nothing
+							node.src += srcToConcat;
+						}
+					});
+				});
+		    },
+		queries: [
+		{ element: "iframe" }
+		]
+	});
+}
+if (self.options.settings.prefs["yt-dynamic-player-replace"]) {
+	// init embed mutation summary
+	embedObserver = new MutationSummary({
+		callback: function (summaries) {
+				summaries.forEach(function (summary) {
+					summary["added"].forEach(function (node) {
+						replaceEmbedYouTubeFlashPlayer(node);
+					});
+				});
+		    },
+		queries: [
+		{ element: "embed" }
+		]
+	});
+}
+// add correct options to existing iframes and replace flash embeds on page load
+(function () {
+	"use strict";
+	var iframes = document.getElementsByTagName("iframe"),
+	iframe,
+	srcToConcat;
+    	for (iframe of iframes) {
+		srcToConcat = addSrcOptions(iframe.src);
+		if (srcToConcat) { // don't cause a reflow for nothing
+			iframe.src += srcToConcat;
+		}
+    	}
 }());
+(function () {
+	"use strict";
+	var embeds = [],
+	embed;
+	for (embed of document.getElementsByTagName("embed")) {
+		embeds.push(embed); // create a static array of nodes
+	}
+	if (embedObserver) {
+		embedObserver.disconnect(); // prevent recursion
+	}
+	for (embed of embeds) {
+		replaceEmbedYouTubeFlashPlayer(embed);
+	}
+	if (embedObserver) {
+		embedObserver.reconnect();
+	}
+}());
+
