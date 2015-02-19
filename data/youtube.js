@@ -55,7 +55,6 @@ function doYoutube() {
 		}
 		var iframe = insertVideoIframe(url.v, insertInto); 
 		if (!iframe) { 
-			console.log("insertion failed");
 			unlock();
 			return false; 
 		}
@@ -79,7 +78,6 @@ var observer = new MutationObserver(function(mutations) {
 	});
 	if (doTube && !trylock()) { // don't even try if already replacing
 		this.disconnect(); // prevent triggering self
-		//console.log("doYoutube"); 
 		doYoutube();
 		bindObserver(); // rebind to catch further mutations
 	}

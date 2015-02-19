@@ -11,7 +11,6 @@
 			var val = unescape( KeyVal[1] );
 			val = val.replace(/\+/g, ' ');
 			Params[key] = val;
-			console.log(key + " = " + val);
 		}
 		return Params;
 	}
@@ -54,7 +53,6 @@
 					}
 				}
 				else { 
-					console.log("No matching video / playlist params");
 					continue;
 				}				
 				if (!self.options.settings.prefs["yt-clicktoplay-ext"]) {
@@ -71,7 +69,6 @@
 				embed.parentNode.removeChild(embed);
 			}
 			else {
-				console.log("No video or playlist in embed src");
 			}
 		}
 	}
