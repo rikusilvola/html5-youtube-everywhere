@@ -17,15 +17,17 @@
 	}
 	var iframes = document.getElementsByTagName("iframe");
 	for (var iframe of iframes) {
-		if (iframe.src.match(/youtube\.(googleapis\.)?com/) && !iframe.src.match(/html5=1/)) {
+		if (iframe.src.match(/youtube\.(googleapis\.)?com/)) {
+            if (!iframe.src.match(/html5=1/)) {
 			iframe.src += (-1 === iframe.src.indexOf("?")) ? "?html5=1" : "&html5=1";
-		}
-		if (!self.options.settings.prefs["yt-clicktoplay-ext"]) {
-			iframe.src += "&autoplay=1"
-		}
-		else {		
-			iframe.src += "&autoplay=0"
-		}
+            }
+            if (!self.options.settings.prefs["yt-clicktoplay-ext"]) {
+                iframe.src += "&autoplay=1"
+            }
+            else {		
+                iframe.src += "&autoplay=0"
+            }
+        }
 	}
 	var embeds = []; // create a static copy of selected DOM elements
 	for (var embed of document.getElementsByTagName("embed")) {
