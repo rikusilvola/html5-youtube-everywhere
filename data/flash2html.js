@@ -104,6 +104,7 @@ function replaceEmbedYouTubeFlashPlayer (embed) {
         }
     }
 }
+var pageLoadListener = function (event) {
 if (self.options.settings.prefs["yt-dynamic-player-replace"]) {
 	// init iframe mutation summary
 	iframeObserver = new MutationSummary({
@@ -123,21 +124,24 @@ if (self.options.settings.prefs["yt-dynamic-player-replace"]) {
 		]
 	});
 }
-if (self.options.settings.prefs["yt-dynamic-player-replace"]) {
-	// init embed mutation summary
-	embedObserver = new MutationSummary({
-		callback: function (summaries) {
-				summaries.forEach(function (summary) {
-					summary["added"].forEach(function (node) {
-						replaceEmbedYouTubeFlashPlayer(node);
-					});
-				});
-		    },
-		queries: [
-		{ element: "embed" }
-		]
-	});
-}
+    if (self.options.settings.prefs["yt-dynamic-player-replace"]) {
+        // init embed mutation summary
+        embedObserver = new MutationSummary({
+            callback: function (summaries) {
+                    summaries.forEach(function (summary) {
+                        summary["added"].forEach(function (node) {
+                            replaceEmbedYouTubeFlashPlayer(node);
+                        });
+                    });
+                },
+            queries: [
+            { element: "embed" }
+            ]
+        });
+    }
+    document.addEventListener("onload", pageLoadListener);
+};
+document.addEventListener("onload", pageLoadListener);
 // add correct options to existing iframes and replace flash embeds on page load
 (function () {
 	"use strict";
