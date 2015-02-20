@@ -31,9 +31,10 @@ Schölhorn] [klemens] for his work on [YouTube ALL HTML5] [ff-youtube-all-html5]
 
 This addon by Riku-Pekka Silvola is licenced under GPLv3.<br />
 The modified [HTML5 Logo][w3c] by W3C is licenced under CC-BY 3.0.<br />
-The mutation-summary library by Google is licensed under the Apache License, Version 2.0
+The [mutation-summary][ms] library by Google is licensed under the Apache License, Version 2.0
 
 [w3c]: http://www.w3.org/html/logo/
 [threedaymonk]: https://github.com/threedaymonk
 [klemens]: https://github.com/klemens
 [ff-youtube-all-html5]: https://github.com/klemens/ff-youtube-all-html5
+[ms] https://code.google.com/p/mutation-summary/
