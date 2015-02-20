@@ -37,4 +37,4 @@ The [mutation-summary][ms] library by Google is licensed under the Apache Licens
 [threedaymonk]: https://github.com/threedaymonk
 [klemens]: https://github.com/klemens
 [ff-youtube-all-html5]: https://github.com/klemens/ff-youtube-all-html5
-[ms] https://code.google.com/p/mutation-summary/
+[ms]: https://code.google.com/p/mutation-summary/
