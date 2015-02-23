@@ -2,14 +2,14 @@
   "name": "html5-youtube-everywhere",
   "title": "HTML5 YouTube Everywhere",
   "id": "jid1-b2ybw6mPlFZm6Q",
-  "description": "Replace the old Flash based embedded YouTube videos with HTML5 iframes and force existing iframes to use the HTML5 player.\nOption for also replacing the Flash based player in YouTube with an HTML5 iframe.",
+  "description": "Replace the old Flash based embedded YouTube videos with HTML5 iframes and force existing iframes to use the HTML5 player.",
   "author": "Riku-Pekka Silvola",
   "permissions": { "private-browsing" : true,
 		   "unsafe-content-script": true },
   "icon": "logo/logo32.png",
   "icon64": "logo/logo64.png",
   "license": "GPLv3",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "preferences": [
 	{
 	  "name": "yt-clicktoplay-ext",
@@ -23,14 +23,16 @@
       "title": "Use iframe player in YouTube",
       "description": "Tries to replace the video player in YouTube with an HTML5 iframe. [EXPERIMENTAL]",
       "type": "bool",
-      "value": false 
+      "value": false,
+      "hidden": true
 	},
 	{
 	  "name": "yt-clicktoplay",
 	  "title": "Enable click to play on YouTube",
 	  "description": "Do not automatically start playing on YouTube",
 	  "type": "bool",
-	  "value": false
+	  "value": false,
+      "hidden": true
 	}  
   ]	 
 }
