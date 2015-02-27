@@ -97,3 +97,18 @@ function bindObserver() {
 }
 
 bindObserver();
+
+// When clicking YouTube logo on YouTube the video has to be removed manually
+// otherwise it will keep playing even though the frame is hidden
+var oldLocation = location.href;
+setInterval(function() {
+  if(location.href != oldLocation) {
+	   var URL = document.URL,
+	   fallbackIframe = document.getElementById("fallbackIframe");
+	   
+	   if (fallbackIframe && URL.match(/youtube/) && !URL.match(/watch/)) {
+		fallbackIframe.remove();
+	   }
+	   oldLocation = location.href
+  }
+}, 500); // check twice every second
