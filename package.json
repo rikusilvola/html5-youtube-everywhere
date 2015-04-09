@@ -40,7 +40,7 @@
 	  "description": "Blacklisted domains, separated by commas.",
 	  "type": "string",
 	  "value": "*.youtube.com",
-	  "hidden": "true"
+	  "hidden": true
 	}  
   ]	 
 }
