@@ -9,12 +9,12 @@
   "icon": "logo/logo32.png",
   "icon64": "logo/logo64.png",
   "license": "GPLv3",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "preferences": [
 	{
 	  "name": "yt-clicktoplay-ext",
-	  "title": "Enable click to play outside YouTube",
-	  "description": "Do not automatically start playing outside of YouTube",
+	  "title": "Click to play",
+	  "description": "Do not automatically start playing videos",
 	  "type": "bool",
 	  "value": true
 	},
@@ -33,6 +33,14 @@
 	  "type": "bool",
 	  "value": false,
       "hidden": true
+	},
+	{
+	  "name": "yt-blacklist",
+	  "title": "Blacklist",
+	  "description": "Blacklisted domains, separated by commas.",
+	  "type": "string",
+	  "value": "*.youtube.com",
+	  "hidden": "true"
 	}  
   ]	 
 }
