@@ -1,4 +1,31 @@
+function manual_blacklist_check() {
+	var blacklist = self.options.settings.prefs["yt-blacklist"].trim().split(/\s*,\s*/);
+	return blacklist.every(function(item) { // if none match, return true, else false
+		if (item == "*") // blacklist everything
+			return false;
+		if (item.match(/^\/.+?\/$/)) {// regexp
+//DEBUG			console.log(item);
+			return !document.URL.match(item);
+		}
+		if (item.match(/^\*\./) && !item.slice(1).match(/\*/)) { // wildcard domain
+			var s_item = item.split(".");
+			if (s_item.length < 2) // not valid domain (allow simply *.tld)
+			  return true;
+			var re_str = "/.*?";
+			for (var i = 1; i < s_item.length; i++) {
+				re_str += "\\." + s_item[i];
+			}
+			re_str += ".*/";
+//DEBUG			console.log(re_str);
+			return !document.URL.match(re_str);
+		}
+		return true;
+	});
+}
 (function () {
+	// if necessary do manual blacklist check then exit if url is blacklisted
+	if (self.options.manual_blacklist == true && manual_blacklist_check() != true) 
+		return;
 	this.getSrcParams = function( src ) {	
 		var query = src.replace(/^[^\?]+\??/,'');
 		var Params = new Object ();
