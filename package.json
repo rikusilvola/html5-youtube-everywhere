@@ -19,22 +19,6 @@
 	  "value": true
 	},
 	{
-      "name": "yt-force-iframe",
-      "title": "Use iframe player in YouTube",
-      "description": "Tries to replace the video player in YouTube with an HTML5 iframe. [EXPERIMENTAL]",
-      "type": "bool",
-      "value": false,
-      "hidden": true
-	},
-	{
-	  "name": "yt-clicktoplay",
-	  "title": "Enable click to play on YouTube",
-	  "description": "Do not automatically start playing on YouTube",
-	  "type": "bool",
-	  "value": false,
-      "hidden": true
-	},
-	{
 	  "name": "yt-blacklist",
 	  "title": "Blacklist",
 	  "description": "Blacklisted domains, separated by commas.",
