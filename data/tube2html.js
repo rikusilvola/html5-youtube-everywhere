@@ -4,15 +4,15 @@ function insertVideoIframe(video, insertInto) {
 	}
 	var player = document.createElement("iframe");
 	player.src = "//www.youtube.com/embed/";
+	player.src += video;
 	if (isPlaylistSite()) {
-		player.src += "videoseries?list=" + getUrlParams().list + "&v=";
+		player.src += "?list=" + getUrlParams().list;
 		// remove irrelevant sidebar as it refers to the old embed frame
 		var sb = document.getElementById("watch7-sidebar-playlist");
 		if (sb) {
 			sb.remove();
 		}
 	}
-	player.src += video;
 	player.src += (-1 === player.src.indexOf("?")) ? "?html5=1" : "&html5=1";
 	player.src += "&autoplay=1"
 	player.id = "fallbackIframe";
@@ -35,6 +35,22 @@ function getUrlParams() {
 	});
 	return params;
 }
+function getSrcParams(src) {	
+    var query = src.replace(/^[^\?]+\??/,'');
+    var Params = new Object ();
+    if ( ! query ) return Params; // return empty object
+    var Pairs = query.split(/[;&]/);
+    for ( var i = 0; i < Pairs.length; i++ ) {
+        var KeyVal = Pairs[i].split('=');
+        if ( ! KeyVal || KeyVal.length != 2 ) continue;
+        var key = unescape( KeyVal[0] );
+        var val = unescape( KeyVal[1] );
+        val = val.replace(/\+/g, ' ');
+        Params[key] = val;
+    }
+    return Params;
+}
+
 mtx = 0;
 function trylock() { return mtx; }
 function lock() { while (trylock()) {} mtx = 1; }
@@ -42,8 +58,9 @@ function unlock() { mtx = 0; }
 function doYoutube() {
 	if (trylock()) return false;
 	else lock();
-	var url = getUrlParams();
+	var url = getSrcParams(location.href);
 	if(url && url.v) {
+//DEBUG        console.log("inserting video id: " + url.v);
 		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 		if (!insertInto) { 
 			unlock(); 
@@ -81,6 +98,7 @@ function doChannel() {
         return false;
     }
 //DEBUG    console.log("id: " + video.attributes["data-video-id"].value);
+//DEBUG    console.log("inserting video id: " + url.v);
     var iframe = insertVideoIframe(video.attributes["data-video-id"].value, video);
     if (!iframe) { 
         unlock();
@@ -145,8 +163,8 @@ function bindObserver() {
 
 function getVideoFrameTitleHref(iframe) {
 	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-	var videohref = innerDoc.getElementsByClassName("html5-title-text");
-	if (videohref.length != 0) {
+	var videohref = innerDoc.getElementsByClassName("html5-title-text") || innerDoc.getElementsByClassName("ytp-watermark");
+	if (videohref.length != 0 && getSrcParams(videohref[0].href).v) {
 		videohref = videohref[0].href;
 	}
 	else {
@@ -159,7 +177,7 @@ function getVideoFrameTitleHref(iframe) {
 // When clicking YouTube logo on YouTube the video has to be removed manually
 // otherwise it will keep playing even though the frame is hidden
 var oldLocation = location.href;
-var videohref;
+var videohref, oldvideohref;
 setInterval(function() {
 	var URL = document.URL, 
         fallbackIframe;
@@ -171,14 +189,18 @@ setInterval(function() {
                 fallbackIframe.remove();
         }
         // iframe playlist does not trigger page refresh automatically so we must do it manually
-        if (fallbackIframe && isPlaylistSite()) {
+        else if (fallbackIframe && isPlaylistSite()) {
             videohref = getVideoFrameTitleHref(fallbackIframe);
-            if(videohref != "" && location.href != videohref) {
-//DEBUG                console.log("videohref: " + videohref);
-//DEBUG                console.log("location: " +  location.href);
-                fallbackIframe.remove();
-                oldlocation = videohref;
-                location.href = videohref; 
+            if(videohref != "") {
+                if (!oldvideohref)
+                    oldvideohref = videohref;
+                else if (videohref != oldvideohref) {
+//DEBUG                    console.log("videohref: " + videohref);
+//DEBUG                    console.log("oldvideohref: " +  oldvideohref);
+                    oldvideohref = videohref;
+                    location.href = videohref;
+                    return;
+                }
             }
         }
         bindObserver();
