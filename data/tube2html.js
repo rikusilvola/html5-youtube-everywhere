@@ -47,11 +47,13 @@ function doYoutube() {
 		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 		if (!insertInto) { 
 			unlock(); 
+//DEBUG            console.log("watch video frame not found");
 			return false; 
 		}
 		var iframe = insertVideoIframe(url.v, insertInto); 
 		if (!iframe) { 
 			unlock();
+//DEBUG            console.log("failed to insert watch video iframe");
 			return false; 
 		}
 		// get rid of the overlay blocking access to player
@@ -60,10 +62,33 @@ function doYoutube() {
 	}
 	else {
 		unlock();
+//DEBUG        console.log("watch url or video id not found");
 		return false;
 	}
 	unlock();
 	return true;
+}
+
+function doChannel() {
+	if (trylock()) 
+        return false;
+	else 
+        lock();
+    var video = document.getElementById("upsell-video");
+    if (!video || !video.hasAttributes() || !video.attributes["data-video-id"]) {
+//DEBUG        console.log("channel video frame not found or has no video id");
+        unlock();
+        return false;
+    }
+//DEBUG    console.log("id: " + video.attributes["data-video-id"].value);
+    var iframe = insertVideoIframe(video.attributes["data-video-id"].value, video);
+    if (!iframe) { 
+        unlock();
+//DEBUG        console.log("failed to insert channel video iframe");
+        return false; 
+    }
+    unlock();
+    return true;
 }
 
 var observer = new MutationObserver(function(mutations) {
@@ -74,13 +99,22 @@ var observer = new MutationObserver(function(mutations) {
 	});
 	if (doTube && !trylock()) { // don't even try if already replacing
 		this.disconnect(); // prevent triggering self
-		doYoutube();
+		if (isChannelSite()) {
+            doChannel();
+        }
+        else {
+            doYoutube();
+        }
 		bindObserver(); // rebind to catch further mutations
 	}
 });
 
 function isPlaylistSite() {
 	return !! (getUrlParams().list);
+}
+
+function isChannelSite() {
+    return document.URL.match(/youtube/) && document.URL.match(/channel/);
 }
 
 var mutationConfig = { childList: true };
@@ -91,12 +125,17 @@ function bindObserver() {
 		return;
 	}
 	if (self.options.settings.prefs["yt-html-youtube"]) {
-		var addTo = document.getElementById("player-api") || document.getElementById("player-api-legacy");
-		if (addTo) observer.observe(addTo, mutationConfig);
+        var addTo = (isChannelSite() ? document.getElementById("upsell-video") : document.getElementById("player-api") || document.getElementById("player-api-legacy"));
+        if (addTo) {
+            if (isChannelSite() && !document.getElementById("fallbackIframe")) {
+                observer.disconnect(); 
+                doChannel(); // has to be forced once
+            }
+            observer.observe(addTo, mutationConfig);
+        }
+//DEBUG        else console.log("no video frame found");
 	}
 }
-
-bindObserver();
 
 function getVideoFrameTitleHref(iframe) {
 	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -116,23 +155,26 @@ function getVideoFrameTitleHref(iframe) {
 var oldLocation = location.href;
 var videohref;
 setInterval(function() {
-	var URL = document.URL,
-	fallbackIframe = document.getElementById("fallbackIframe");
-	if(location.href != oldLocation) {
-		if (fallbackIframe && URL.match(/youtube/) && !URL.match(/watch/)) {
-			fallbackIframe.remove();
-		}
-		oldLocation = location.href
-	}
-	// iframe playlist does not trigger page refresh automatically so we must do it manually
-	if (fallbackIframe && URL.match(/youtube/) && URL.match(/watch/)) {
-		videohref = getVideoFrameTitleHref(fallbackIframe);
-		if(videohref != "" && location.href != videohref) {
-			console.log("videohref: " + videohref);
-			console.log("location: " +  location.href);
-			fallbackIframe.remove();
-			oldlocation = videohref;
-			location.href = videohref; 
-		}
-	}
+	var URL = document.URL, 
+        fallbackIframe;
+    if (URL.match(/youtube/)) {
+        fallbackIframe = document.getElementById("fallbackIframe");
+        if(location.href != oldLocation) {
+            oldLocation = location.href;
+            if (fallbackIframe)
+                fallbackIframe.remove();
+        }
+        // iframe playlist does not trigger page refresh automatically so we must do it manually
+        if (fallbackIframe && isPlaylistSite()) {
+            videohref = getVideoFrameTitleHref(fallbackIframe);
+            if(videohref != "" && location.href != videohref) {
+//DEBUG                console.log("videohref: " + videohref);
+//DEBUG                console.log("location: " +  location.href);
+                fallbackIframe.remove();
+                oldlocation = videohref;
+                location.href = videohref; 
+            }
+        }
+        bindObserver();
+    }
 }, 500); // check twice every second
