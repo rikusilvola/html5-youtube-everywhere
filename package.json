@@ -9,7 +9,7 @@
   "icon": "logo/logo32.png",
   "icon64": "logo/logo64.png",
   "license": "GPLv3",
-  "version": "0.5.5b1",
+  "version": "0.5.5b2",
   "preferences": [
 	{
 	  "name": "yt-clicktoplay-ext",
@@ -23,7 +23,7 @@
 	  "title": "Blacklist",
 	  "description": "Blacklisted domains, separated by commas.",
 	  "type": "string",
-	  "value": "*.youtube.com",
+	  "value": "\/.*youtube.com(?!\\/v\\/).*\/",
 	  "hidden": true
 	}, 
 	{
