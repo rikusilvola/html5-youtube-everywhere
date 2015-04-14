@@ -163,12 +163,18 @@ function bindObserver() {
 
 function getVideoFrameTitleHref(iframe) {
 	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-	var videohref = innerDoc.getElementsByClassName("html5-title-text") || innerDoc.getElementsByClassName("ytp-watermark");
+	var videohref = innerDoc.getElementsByClassName("html5-title-text");
+    if (videohref.length == 0)
+        videohref = innerDoc.getElementsByClassName("ytp-title");
+    if (videohref.length == 0)
+        videohref = innerDoc.getElementsByClassName("ytp-watermark");
 	if (videohref.length != 0 && getSrcParams(videohref[0].href).v) {
 		videohref = videohref[0].href;
+//DEBUG        console.log("Video Frame Title href:" + videohref);
 	}
 	else {
 		videohref = 0;
+//DEBUG        console.log("no video frame title found");
 	}
 	return videohref;
 }
