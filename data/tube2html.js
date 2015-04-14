@@ -127,9 +127,15 @@ function bindObserver() {
 	if (self.options.settings.prefs["yt-html-youtube"]) {
         var addTo = (isChannelSite() ? document.getElementById("upsell-video") : document.getElementById("player-api") || document.getElementById("player-api-legacy"));
         if (addTo) {
-            if (isChannelSite() && !document.getElementById("fallbackIframe")) {
-                observer.disconnect(); 
-                doChannel(); // has to be forced once
+            // first time has to be forced, observer then notices later scripted changes and reacts
+            if (!document.getElementById("fallbackIframe")) {
+                observer.disconnect();
+                if (isChannelSite()) {
+                    doChannel();
+                }
+                else {
+                    doYoutube();
+                }
             }
             observer.observe(addTo, mutationConfig);
         }
