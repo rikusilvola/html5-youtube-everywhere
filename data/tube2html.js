@@ -138,36 +138,32 @@ function isChannelSite() {
 var mutationConfig = { childList: true };
 	
 function bindObserver() {		
-	if (isPlaylistSite() && !self.options.settings.prefs["yt-experimental-playlist"]) {
-		// Support for playlists only experimental after introduction of WebM player
-		return;
-	}
 	if (self.options.settings.prefs["yt-html-youtube"]) {
-        var addTo = (isChannelSite() ? document.getElementById("upsell-video") : document.getElementById("player-api") || document.getElementById("player-api-legacy"));
-        if (addTo) {
-            // first time has to be forced, observer then notices later scripted changes and reacts
-            if (!document.getElementById("fallbackIframe")) {
-                observer.disconnect();
-                if (isChannelSite()) {
-                    doChannel();
-                }
-                else {
-                    doYoutube();
-                }
-            }
-            observer.observe(addTo, mutationConfig);
-        }
-//DEBUG        else console.log("no video frame found");
+		var addTo = (isChannelSite() ? document.getElementById("upsell-video") : document.getElementById("player-api") || document.getElementById("player-api-legacy"));
+		if (addTo) {
+		    // first time has to be forced, observer then notices later scripted changes and reacts
+		    if (!document.getElementById("fallbackIframe")) {
+			observer.disconnect();
+			if (isChannelSite()) {
+			    doChannel();
+			}
+			else {
+			    doYoutube();
+			}
+		    }
+		    observer.observe(addTo, mutationConfig);
+		}
+	//DEBUG        else console.log("no video frame found");
 	}
 }
 
 function getVideoFrameTitleHref(iframe) {
 	var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-	var videohref = innerDoc.getElementsByClassName("html5-title-text");
-    if (videohref.length == 0)
-        videohref = innerDoc.getElementsByClassName("ytp-title");
-    if (videohref.length == 0)
-        videohref = innerDoc.getElementsByClassName("ytp-watermark");
+	var videohref = innerDoc.getElementsByClassName("html5-title-text"); //html5
+	if (videohref.length == 0)
+		videohref = innerDoc.getElementsByClassName("ytp-title"); //webm9
+	if (videohref.length == 0)
+		videohref = innerDoc.getElementsByClassName("ytp-watermark"); //webm8
 	if (videohref.length != 0 && getSrcParams(videohref[0].href).v) {
 		videohref = videohref[0].href;
 //DEBUG        console.log("Video Frame Title href:" + videohref);
