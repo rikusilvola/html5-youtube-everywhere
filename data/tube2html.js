@@ -60,17 +60,17 @@ function doYoutube() {
 	else lock();
 	var url = getSrcParams(location.href);
 	if(url && url.v) {
-//DEBUG        console.log("inserting video id: " + url.v);
+        //DEBUG console.log("inserting video id: " + url.v);
 		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 		if (!insertInto) { 
 			unlock(); 
-//DEBUG            console.log("watch video frame not found");
+            //DEBUG console.log("watch video frame not found");
 			return false; 
 		}
 		var iframe = insertVideoIframe(url.v, insertInto); 
 		if (!iframe) { 
 			unlock();
-//DEBUG            console.log("failed to insert watch video iframe");
+            //DEBUG console.log("failed to insert watch video iframe");
 			return false; 
 		}
 		// get rid of the overlay blocking access to player
@@ -79,7 +79,7 @@ function doYoutube() {
 	}
 	else {
 		unlock();
-//DEBUG        console.log("watch url or video id not found");
+        //DEBUG console.log("watch url or video id not found");
 		return false;
 	}
 	unlock();
@@ -93,16 +93,16 @@ function doChannel() {
         lock();
     var video = document.getElementById("upsell-video");
     if (!video || !video.hasAttributes() || !video.attributes["data-video-id"]) {
-//DEBUG        console.log("channel video frame not found or has no video id");
+        //DEBUG console.log("channel video frame not found or has no video id");
         unlock();
         return false;
     }
-//DEBUG    console.log("id: " + video.attributes["data-video-id"].value);
-//DEBUG    console.log("inserting video id: " + url.v);
+    //DEBUG console.log("id: " + video.attributes["data-video-id"].value);
+    //DEBUG console.log("inserting video id: " + url.v);
     var iframe = insertVideoIframe(video.attributes["data-video-id"].value, video);
     if (!iframe) { 
         unlock();
-//DEBUG        console.log("failed to insert channel video iframe");
+        //DEBUG console.log("failed to insert channel video iframe");
         return false; 
     }
     unlock();
@@ -111,18 +111,31 @@ function doChannel() {
 
 var observer = new MutationObserver(function(mutations) {
 	var doTube = false;
+	var fallbackIframe = document.getElementById("fallbackIframe");
+	if (fallbackIframe) { 
+		innerDoc = fallbackIframe.contentDocument || fallbackIframe.contentWindow.document;
+		if(innerDoc && innerDoc.getElementsByTagName("embed").length > 0) {
+			//DEBUG console.log("iframe has embeds: " + innerDoc.getElementsByTagName("embed").length);
+			return; // forced fallback to Flash, do something?
+		}
+		else {
+			// all is well
+			return;
+		}
+	}
 	mutations.forEach(function(mutation) { 
 		if (mutation.addedNodes.length > 0) // only replace when something was added
 			doTube = true;
 	});
 	if (doTube && !trylock()) { // don't even try if already replacing
+		//DEBUG console.log("doing youtube");
 		this.disconnect(); // prevent triggering self
 		if (isChannelSite()) {
-            doChannel();
-        }
-        else {
-            doYoutube();
-        }
+		    doChannel();
+		}
+		else {
+		    doYoutube();
+		}
 		bindObserver(); // rebind to catch further mutations
 	}
 });
@@ -138,23 +151,29 @@ function isChannelSite() {
 var mutationConfig = { childList: true };
 	
 function bindObserver() {		
-	if (self.options.settings.prefs["yt-html-youtube"]) {
-		var addTo = (isChannelSite() ? document.getElementById("upsell-video") : document.getElementById("player-api") || document.getElementById("player-api-legacy"));
-		if (addTo) {
-		    // first time has to be forced, observer then notices later scripted changes and reacts
-		    if (!document.getElementById("fallbackIframe")) {
-			observer.disconnect();
-			if (isChannelSite()) {
-			    doChannel();
-			}
-			else {
-			    doYoutube();
-			}
-		    }
-		    observer.observe(addTo, mutationConfig);
+	var addTo = (isChannelSite() ? document.getElementById("upsell-video") : document.getElementById("player-api") || document.getElementById("player-api-legacy"));
+	if (addTo) {
+		var iframe = document.getElementById("fallbackIframe");	
+		if (iframe && iframe.parentElement) {
+			var children = Array.prototype.slice.call(iframe.parentElement.children, 0);
+			//DEBUG console.log(children.length > 1 ? "removing iframe siblings" : "no siblings");
+			for (var i = 0; i < children.length; i++)
+				if (children[i].id != "fallbackIframe")
+					children[i].remove();
 		}
-	//DEBUG        else console.log("no video frame found");
+	    // first time has to be forced, observer then notices later scripted changes and reacts
+	    if (!iframe) {
+		observer.disconnect();
+		if (isChannelSite()) {
+		    doChannel();
+		}
+		else {
+		    doYoutube();
+		}
+	    }
+	    observer.observe(addTo, mutationConfig);
 	}
+	else console.log("no video frame found");
 }
 
 function getVideoFrameTitleHref(iframe) {
@@ -166,11 +185,11 @@ function getVideoFrameTitleHref(iframe) {
 		videohref = innerDoc.getElementsByClassName("ytp-watermark"); //webm8
 	if (videohref.length != 0 && getSrcParams(videohref[0].href).v) {
 		videohref = videohref[0].href;
-//DEBUG        console.log("Video Frame Title href:" + videohref);
+        //DEBUG console.log("Video Frame Title href:" + videohref);
 	}
 	else {
 		videohref = 0;
-//DEBUG        console.log("no video frame title found");
+        //DEBUG console.log("no video frame title found");
 	}
 	return videohref;
 }
@@ -180,31 +199,32 @@ function getVideoFrameTitleHref(iframe) {
 // otherwise it will keep playing even though the frame is hidden
 var oldLocation = location.href;
 var videohref, oldvideohref;
-setInterval(function() {
+var interval = setInterval(function() {
+	if (!self.options.settings.prefs["yt-html-youtube"])
+		return;
 	var URL = document.URL, 
         fallbackIframe;
-    if (URL.match(/youtube/)) {
-        fallbackIframe = document.getElementById("fallbackIframe");
-        if(location.href != oldLocation) {
-            oldLocation = location.href;
-            if (fallbackIframe)
-                fallbackIframe.remove();
-        }
-        // iframe playlist does not trigger page refresh automatically so we must do it manually
-        else if (fallbackIframe && isPlaylistSite()) {
-            videohref = getVideoFrameTitleHref(fallbackIframe);
-            if(videohref != "") {
-                if (!oldvideohref)
-                    oldvideohref = videohref;
-                else if (videohref != oldvideohref) {
-//DEBUG                    console.log("videohref: " + videohref);
-//DEBUG                    console.log("oldvideohref: " +  oldvideohref);
-                    oldvideohref = videohref;
-                    location.href = videohref;
-                    return;
-                }
-            }
-        }
-        bindObserver();
-    }
+	//DEBUG console.log("document url: " + URL);
+	fallbackIframe = document.getElementById("fallbackIframe");
+	if(location.href != oldLocation) {
+	    oldLocation = location.href;
+	    if (fallbackIframe)
+		fallbackIframe.remove();
+	}
+	// iframe playlist does not trigger page refresh automatically so we must do it manually
+	else if (fallbackIframe && isPlaylistSite()) {
+	    videohref = getVideoFrameTitleHref(fallbackIframe);
+	    if(videohref != "") {
+		if (!oldvideohref)
+		    oldvideohref = videohref;
+		else if (videohref != oldvideohref) {
+		    //DEBUG console.log("videohref: " + videohref);
+		    //DEBUG console.log("oldvideohref: " +  oldvideohref);
+		    oldvideohref = videohref;
+		    location.href = videohref;
+		    return;
+		}
+	    }
+	}
+	bindObserver();
 }, 500); // check twice every second
