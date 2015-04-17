@@ -4,7 +4,7 @@ function manual_blacklist_check() {
 		if (item == "*") // blacklist everything
 			return false;
 		if (item.match(/^\/.+?\/$/)) {// regexp
-//DEBUG			console.log(item);
+//DEBUG			//DEBUG console.log(item);
 			return !document.URL.match(item);
 		}
 		if (item.match(/^\*\./) && !item.slice(1).match(/\*/)) { // wildcard domain
@@ -16,16 +16,27 @@ function manual_blacklist_check() {
 				re_str += "\\." + s_item[i];
 			}
 			re_str += ".*/";
-//DEBUG			console.log(re_str);
+//DEBUG			//DEBUG console.log(re_str);
 			return !document.URL.match(re_str);
 		}
 		return true;
 	});
 }
+function isInIframe() {
+	try {
+		//DEBUG console.log("top:" + top);
+		//DEBUG console.log("window: " + window);
+		return top !== window;
+	}
+	catch (e) {
+		return true;
+	}
+}
 (function () {
-	// if necessary do manual blacklist check then exit if url is blacklisted
-	if (self.options.manual_blacklist == true && manual_blacklist_check() != true) 
+	// this mod should not run in iframes. if necessary do manual blacklist check then exit if url is blacklisted
+	if (isInIframe() || (self.options.manual_blacklist == true && manual_blacklist_check() != true)) 
 		return;
+console.log("flashmod called");
 	this.getSrcParams = function( src ) {	
 		var query = src.replace(/^[^\?]+\??/,'');
 		var Params = new Object ();

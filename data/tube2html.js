@@ -194,18 +194,29 @@ function getVideoFrameTitleHref(iframe) {
 	return videohref;
 }
 
+function isInIframe() {
+	try {
+		//DEBUG console.log("top:" + top);
+		//DEBUG console.log("window: " + window);
+		return top !== window;
+	}
+	catch (e) {
+		return true;
+	}
+}
 
-// When clicking YouTube logo on YouTube the video has to be removed manually
-// otherwise it will keep playing even though the frame is hidden
 var oldLocation = location.href;
 var videohref, oldvideohref;
 var interval = setInterval(function() {
-	if (!self.options.settings.prefs["yt-html-youtube"])
+	if (isInIframe() || !self.options.settings.prefs["yt-html-youtube"])
 		return;
+        console.log("tubemod called");
 	var URL = document.URL, 
         fallbackIframe;
 	//DEBUG console.log("document url: " + URL);
 	fallbackIframe = document.getElementById("fallbackIframe");
+	// When clicking YouTube logo on YouTube the video has to be removed manually
+	// otherwise it will keep playing even though the frame is hidden
 	if(location.href != oldLocation) {
 	    oldLocation = location.href;
 	    if (fallbackIframe)
