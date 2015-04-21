@@ -1,3 +1,34 @@
+function manual_blacklist_check() {
+	var blacklist = self.options.blacklist;
+    console.log("Checking blacklist for URL " + document.URL);
+	var res = blacklist.every(function(item) { // if none match, return true, else false
+		if (item == "*") { // blacklist everything
+            console.log("blacklist all");
+			return false;
+        }
+		if (item.match(/^\/.+?\/$/)) {// regexp
+            console.log("regexp: " + item);
+            var ret = !document.URL.match(item.slice(1,-1));
+            console.log(ret);
+			return ret;
+		}
+		if (item.match(/^\*\./) && !item.slice(1).match(/\*/)) { // wildcard domain
+			var s_item = item.split(".");
+			if (s_item.length < 2) // not valid domain (allow simply *.tld)
+			  return true;
+            var d_str = item.replace(/^\*\./, "$&");
+            console.log("domain wcard: " + d_str);
+            console.log("document hostname: " + document.hostname);
+            var ret = !document.hostname == d_str;
+            console.log(ret);
+			return ret;
+		}
+		return true;
+	});
+    console.log(res ? "No match" : "Match");
+    return res;
+}
+
 function insertVideoIframe(video, insertInto) {
 	if (!insertInto) {
 		return false;
@@ -58,16 +89,16 @@ function unlock() { mtx = 0; }
 function doYoutube() {
 	if (trylock()) return false;
 	else lock();
-	var url = getSrcParams(location.href);
-	if(url && url.v) {
-        //DEBUG console.log("inserting video id: " + url.v);
+	var doc_url = getSrcParams(location.href);
+	if(doc_url && doc_url.v) {
+        //DEBUG console.log("inserting video id: " + doc_url.v);
 		var insertInto = document.getElementById("player-api") || document.getElementById("player-api-legacy");
 		if (!insertInto) { 
 			unlock(); 
             //DEBUG console.log("watch video frame not found");
 			return false; 
 		}
-		var iframe = insertVideoIframe(url.v, insertInto); 
+		var iframe = insertVideoIframe(doc_url.v, insertInto); 
 		if (!iframe) { 
 			unlock();
             //DEBUG console.log("failed to insert watch video iframe");
@@ -79,7 +110,7 @@ function doYoutube() {
 	}
 	else {
 		unlock();
-        //DEBUG console.log("watch url or video id not found");
+        //DEBUG console.log("watch doc_url or video id not found");
 		return false;
 	}
 	unlock();
@@ -98,7 +129,7 @@ function doChannel() {
         return false;
     }
     //DEBUG console.log("id: " + video.attributes["data-video-id"].value);
-    //DEBUG console.log("inserting video id: " + url.v);
+    //DEBUG console.log("inserting video id: " + doc_url.v);
     var iframe = insertVideoIframe(video.attributes["data-video-id"].value, video);
     if (!iframe) { 
         unlock();
@@ -208,10 +239,10 @@ function isInIframe() {
 var oldLocation = location.href;
 var videohref, oldvideohref;
 var interval = setInterval(function() {
-	if (isInIframe() || !self.options.settings.prefs["yt-html-youtube"])
+	if (isInIframe() || !self.options.settings.prefs["yt-html-youtube"] || (self.options.manual_blacklist == true && manual_blacklist_check() != true))
 		return;
-        console.log("tubemod called");
-	var URL = document.URL, 
+    console.log("tubemod called");
+	var doc_url = document.URL, 
         fallbackIframe;
 	//DEBUG console.log("document url: " + URL);
 	fallbackIframe = document.getElementById("fallbackIframe");

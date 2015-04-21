@@ -9,7 +9,7 @@
   "icon": "logo/logo32.png",
   "icon64": "logo/logo64.png",
   "license": "GPLv3",
-  "version": "0.5.6b2",
+  "version": "0.5.7b",
   "preferences": [
 	{
 	  "name": "yt-clicktoplay-ext",
@@ -23,7 +23,7 @@
 	  "title": "Blacklist",
 	  "description": "Blacklisted domains, separated by commas.",
 	  "type": "string",
-	  "value": "\/.*youtube.com.*\/",
+	  "value": "\/.*youtube\\.com.*\/",
 	  "hidden": true
 	}, 
 	{
@@ -31,7 +31,8 @@
 	  "title": "Enable on YouTube",
 	  "description": "Replaces player on YouTube with an iFrame",
 	  "type": "bool",
-	  "value": true
+	  "value": true,
+	  "hidden": true
 	}
   ]	 
 }

@@ -1,26 +1,32 @@
 function manual_blacklist_check() {
-	var blacklist = self.options.settings.prefs["yt-blacklist"].trim().split(/\s*,\s*/);
-	return blacklist.every(function(item) { // if none match, return true, else false
-		if (item == "*") // blacklist everything
+	var blacklist = self.options.blacklist;
+    console.log("Checking blacklist for URL " + document.URL);
+	var res = blacklist.every(function(item) { // if none match, return true, else false
+		if (item == "*") { // blacklist everything
+            console.log("blacklist all");
 			return false;
+        }
 		if (item.match(/^\/.+?\/$/)) {// regexp
-//DEBUG			//DEBUG console.log(item);
-			return !document.URL.match(item);
+            console.log("regexp: " + item);
+            var ret = !document.URL.match(item.slice(1,-1));
+            console.log(ret);
+			return ret;
 		}
 		if (item.match(/^\*\./) && !item.slice(1).match(/\*/)) { // wildcard domain
 			var s_item = item.split(".");
 			if (s_item.length < 2) // not valid domain (allow simply *.tld)
 			  return true;
-			var re_str = "/.*?";
-			for (var i = 1; i < s_item.length; i++) {
-				re_str += "\\." + s_item[i];
-			}
-			re_str += ".*/";
-//DEBUG			//DEBUG console.log(re_str);
-			return !document.URL.match(re_str);
+            var d_str = item.replace(/^\*\./, "$&");
+            console.log("domain wcard: " + d_str);
+            console.log("document hostname: " + document.hostname);
+            var ret = !document.hostname == d_str;
+            console.log(ret);
+			return ret;
 		}
 		return true;
 	});
+    console.log(res ? "No match" : "Match");
+    return res;
 }
 function isInIframe() {
 	try {
@@ -36,7 +42,7 @@ function isInIframe() {
 	// this mod should not run in iframes. if necessary do manual blacklist check then exit if url is blacklisted
 	if (isInIframe() || (self.options.manual_blacklist == true && manual_blacklist_check() != true)) 
 		return;
-console.log("flashmod called");
+    console.log("flashmod called");
 	this.getSrcParams = function( src ) {	
 		var query = src.replace(/^[^\?]+\??/,'');
 		var Params = new Object ();
