@@ -28,6 +28,7 @@ function manual_blacklist_check() {
     console.log(res ? "No match" : "Match");
     return res;
 }
+
 function isInIframe() {
 	try {
 		//DEBUG console.log("top:" + top);
