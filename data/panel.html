@@ -6,29 +6,21 @@
             body { background-color: white;
                    color: black;
             }
-            h1 { font: 24px sans-serif; }
-            h2 { font: 20px sans-serif; }
             p, ul { font: 12px sans-serif; -moz-user-select: none; }
             ul { list-style-type: none; }
-            img { vertical-align: middle; height: 24px; margin-right: 10px; }
             a { text-decoration: none; color: #000; }
             a:hover { text-decoration: underline; }
-            span { display: inline-block; width: 100%; }
-            #domain { background-color: #EEE; font-size: 130%; }
-            .bold { font-weight: bold; }
             .hidden { display: none; }
         </style>
     </head>
     <body>
         <p id="blacklist">
-            <ul>
-                <li id="bpg"><a href="#" >Disable on this page</a></li>
-                <li id="ubpg"><a href="#" >Enable on this page</a></li>
-                <li id="bdm"><a href="#" >Disable on this domain</a></li>
-                <li id="ubdm"><a href="#" >Enable on this domain</a></li>
-                <li id="ball"><a href="#" >Temporarily disable extension</a></li>
-                <li id="uball"><a href="#" >Enable extension</a></li>
-            </ul>
+            <a href="#"  id="bdm">Disable on this domain</a>
+            <a href="#"  id="ubdm">Enable on this domain</a>
+            <a href="#" id="bpg">Disable on this page</a>
+            <a href="#" id="ubpg">Enable on this page</a>
+            <a href="#"  id="ball">Disable globally</a>
+            <a href="#"  id="uball">Enable globally</a>
         </p>
     </body>
 </html>

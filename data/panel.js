@@ -1,3 +1,6 @@
+var firstload = true;
+var blocked;
+
 function blockURL() {
     console.log("emitting block-url");
     self.port.emit('block-url', '');
@@ -53,7 +56,15 @@ self.port.on("refresh", function(args) {
             ball.hidden = args.hidden["ball"];
             uball.hidden = args.hidden["uball"];
        }
-   }   
+       if (firstload) {
+            firstload = false;
+            blocked = args.blocked;
+       }
+       else if (args.blocked != blocked) {
+           self.port.emit("refresh-blocks", '');
+           blocked = args.blocked;
+       }
+   }
 });
 
 console.log("panel loaded");
