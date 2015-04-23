@@ -239,7 +239,7 @@ function isInIframe() {
 var oldLocation = location.href;
 var videohref, oldvideohref;
 var interval = setInterval(function() {
-	if (isInIframe() || !self.options.settings.prefs["yt-html-youtube"] || (self.options.manual_blacklist == true && manual_blacklist_check() != true))
+	if (isInIframe() || (self.options.manual_blacklist == true && manual_blacklist_check() != true))
 		return;
     console.log("tubemod called");
 	var doc_url = document.URL, 
