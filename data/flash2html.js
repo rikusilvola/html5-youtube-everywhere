@@ -16,10 +16,10 @@ function manual_blacklist_check() {
 			var s_item = item.split(".");
 			if (s_item.length < 2) // not valid domain (allow simply *.tld)
 			  return true;
-            var d_str = item.replace(/^\*\./, "$&");
+            var d_str = item.replace(/^\*\./, "");
             console.log("domain wcard: " + d_str);
-            console.log("document hostname: " + document.hostname);
-            var ret = !document.hostname == d_str;
+            console.log("document hostname: " + location.hostname);
+            var ret = !(location.hostname == d_str);
             console.log(ret);
 			return ret;
 		}
