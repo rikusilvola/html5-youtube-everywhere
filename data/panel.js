@@ -56,6 +56,11 @@ self.port.on("refresh", function(args) {
             ball.hidden = args.hidden["ball"];
             uball.hidden = args.hidden["uball"];
        }
+   }
+});
+
+self.port.on("blockstatus", function(args) {
+   if (args) {
        if (firstload) {
             firstload = false;
             blocked = args.blocked;
@@ -66,5 +71,4 @@ self.port.on("refresh", function(args) {
        }
    }
 });
-
 console.log("panel loaded");
