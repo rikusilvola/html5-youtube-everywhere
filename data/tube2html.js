@@ -176,7 +176,7 @@ function isPlaylistSite() {
 }
 
 function isChannelSite() {
-    return document.URL.match(/youtube/) && document.URL.match(/channel/);
+    return document.URL.match(/youtube/) && (document.URL.match(/channel/) || document.URL.match(/user/));
 }
 
 var mutationConfig = { childList: true };
