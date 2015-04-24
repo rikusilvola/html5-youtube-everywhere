@@ -13,15 +13,6 @@ play with newer versions of Firefox.
 Under windows set `media.windows-media-foundation.enabled` to true and under 
 linux set `gstreamer.enabled` to true to enable H264 support.
 
-## Blacklisting ##
-
-You may add multiple domain wildcards and / or regexps, each separated by comma.
-Domain wildcards follow the format *.domain.tld and regular expressions can 
-include anything inside two forward slashes (/).
-
-To blacklist domains you may add them to the setting yt-blacklist. You must 
-search for it on about:config as it is hidden. 
-
 ## To install
 
 Visit https://addons.mozilla.org/en-US/firefox/addon/html5-youtube-everywhere/
