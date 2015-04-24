@@ -6,6 +6,7 @@
             body { background-color: white;
                    color: black;
             }
+            span { display: inline-block; width: 100%; }
             p, ul { font: 12px sans-serif; -moz-user-select: none; }
             ul { list-style-type: none; }
             a { text-decoration: none; color: #000; }
@@ -15,12 +16,12 @@
     </head>
     <body>
         <p id="blacklist">
-            <a href="#"  id="bdm">Disable on this domain</a>
-            <a href="#"  id="ubdm">Enable on this domain</a>
-            <a href="#" id="bpg">Disable on this page</a>
-            <a href="#" id="ubpg">Enable on this page</a>
-            <a href="#"  id="ball">Disable globally</a>
-            <a href="#"  id="uball">Enable globally</a>
+            <span><a href="#"  id="bdm">Disable on this domain</a></span>
+            <span><a href="#"  id="ubdm">Enable on this domain</a></span>
+            <span><a href="#" id="bpg">Disable on this page</a></span>
+            <span><a href="#" id="ubpg">Enable on this page</a></span>
+            <span><a href="#"  id="ball">Disable globally</a></span>
+            <span><a href="#"  id="uball">Enable globally</a></span>
         </p>
     </body>
 </html>
