@@ -6,22 +6,30 @@
             body { background-color: white;
                    color: black;
             }
-            span { display: inline-block; width: 100%; }
+            h1 { font: 24px sans-serif; }
+            h2 { font: 20px sans-serif; }
             p, ul { font: 12px sans-serif; -moz-user-select: none; }
             ul { list-style-type: none; }
+            img { vertical-align: middle; height: 24px; margin-right: 10px; }
             a { text-decoration: none; color: #000; }
             a:hover { text-decoration: underline; }
+            span { display: inline-block; width: 100%; }
+            #domain { background-color: #EEE; font-size: 120%; }
+            .bold { font-weight: bold; }
             .hidden { display: none; }
         </style>
     </head>
     <body>
+        <p>
+            <span id="domain"></span>
+        </p>
         <p id="blacklist">
-            <span><a href="#"  id="bdm">Disable on this domain</a></span>
-            <span><a href="#"  id="ubdm">Enable on this domain</a></span>
+            <span><a href="#" id="bdm">Disable on this domain</a></span>
+            <span><a href="#" id="ubdm">Enable on this domain</a></span>
             <span><a href="#" id="bpg">Disable on this page</a></span>
             <span><a href="#" id="ubpg">Enable on this page</a></span>
-            <span><a href="#"  id="ball">Disable globally</a></span>
-            <span><a href="#"  id="uball">Enable globally</a></span>
+            <span><a href="#" id="ball">Disable globally</a></span>
+            <span><a href="#" id="uball">Enable globally</a></span>
         </p>
     </body>
 </html>

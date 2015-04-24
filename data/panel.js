@@ -1,6 +1,11 @@
 var firstload = true;
 var blocked;
 
+function update(id, text) {
+  var node = document.getElementById(id);
+  if(node.hasChildNodes()) node.removeChild(node.firstChild);
+  node.appendChild(document.createTextNode(text));
+}
 function blockURL() {
     console.log("emitting block-url");
     self.port.emit('block-url', '');
@@ -56,6 +61,13 @@ self.port.on("refresh", function(args) {
             ball.hidden = args.hidden["ball"];
             uball.hidden = args.hidden["uball"];
        }
+       domain = args.domain;
+   }
+   if (domain == null || domain == "") {
+       update("domain", "HTML5 YouTube Everywhere");
+   }
+   else {
+        update("domain", domain);
    }
 });
 
